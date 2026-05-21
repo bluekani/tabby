@@ -9,9 +9,16 @@ import * as url from 'url'
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 const electronInfo = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../node_modules/electron/package.json')))
+const packageInfo = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../package.json')))
 
-export let version = childProcess.execSync('git describe --tags', { encoding:'utf-8' })
-version = version.substring(1).trim()
+let describedVersion = ''
+try {
+    describedVersion = childProcess.execSync('git describe --tags', { encoding: 'utf-8' }).trim()
+} catch {
+    describedVersion = `v${packageInfo.version}`
+}
+
+export let version = describedVersion.startsWith('v') ? describedVersion.substring(1) : describedVersion
 version = version.replace('-', '-c')
 
 if (version.includes('-c')) {
