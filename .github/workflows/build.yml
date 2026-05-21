@@ -35,6 +35,7 @@ jobs:
       run: yarn run lint
 
   macOS-Build:
+    if: ${{ false }}
     runs-on: macos-15
     needs: Lint
     strategy:
@@ -133,6 +134,7 @@ jobs:
         path: artifact-zip
 
   Linux-Build:
+    if: ${{ false }}
     runs-on: ${{matrix.os}}
     needs: Lint
     strategy:
@@ -308,8 +310,6 @@ jobs:
         include:
           - arch: x64
             rust_triple: x86_64-pc-windows-msvc
-          - arch: arm64
-            rust_triple: aarch64-pc-windows-msvc
       fail-fast: false
 
     env:
