@@ -73,7 +73,7 @@ export class SerialTabComponent extends ConnectableTerminalTabComponent<SerialPr
 
     protected attachSessionHandlers () {
         this.attachSessionHandler(this.session!.serviceMessage$, msg => {
-            this.write(`\r\n${colors.black.bgWhite(' Serial ')} ${msg}\r\n`)
+            this.write(`\r\n${colors.black.bgWhite(' SERIAL ')} ${msg}\r\n`)
             this.session?.resize(this.size.columns, this.size.rows)
         })
         super.attachSessionHandlers()
@@ -82,7 +82,7 @@ export class SerialTabComponent extends ConnectableTerminalTabComponent<SerialPr
     protected onSessionDestroyed (): void {
         if (this.frontend) {
             // Session was closed abruptly
-            this.write('\r\n' + colors.black.bgWhite(' SERIAL ') + ` session closed\r\n`)
+            this.write('\r\n' + colors.black.bgWhite(' SERIAL ') + ` ${this.session?.profile.options.port}: session closed\r\n`)
 
             super.onSessionDestroyed()
         }
