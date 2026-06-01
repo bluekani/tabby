@@ -163,7 +163,27 @@ export class SerialSession extends BaseSession {
     }
 
     async gracefullyKillProcess (): Promise<void> {
-        this.kill('TERM')
+        if (!this.serial || !this.serial.isOpen) {
+            return
+        }
+
+        await new Promise<void>(resolve => {
+            let resolved = false
+            const done = () => {
+                if (!resolved) {
+                    resolved = true
+                    resolve()
+                }
+            }
+
+            this.serial!.once('close', done)
+            this.serial!.close(error => {
+                if (error) {
+                    this.logger.warn(`Serial close error: ${error.message}`)
+                }
+                done()
+            })
+        })
     }
 
     supportsWorkingDirectory (): boolean {
