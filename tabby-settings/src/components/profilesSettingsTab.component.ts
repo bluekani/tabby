@@ -99,6 +99,9 @@ export class ProfilesSettingsTabComponent extends BaseComponent {
         if (!result) {
             return
         }
+        if ('action' in result) {
+            return
+        }
         if (!result.name) {
             const cfgProxy = this.profilesService.getConfigProxyForProfile(result)
             result.name = this.profilesService.providerForProfile(result)?.getSuggestedName(cfgProxy) ?? this.translate.instant('{name} copy', base)
@@ -112,11 +115,27 @@ export class ProfilesSettingsTabComponent extends BaseComponent {
         if (!result) {
             return
         }
-        await this.profilesService.writeProfile(result)
-        await this.config.save()
+
+        if ('action' in result) {
+            if (result.action === 'delete') {
+                return
+            }
+            if (result.action === 'duplicate') {
+                const duplicatedProfile = result as { action: 'duplicate', profile: PartialProfile<Profile> }
+                await this.editProfile(duplicatedProfile.profile)
+                return
+            }
+        } else {
+            if (!result.id) {
+                await this.profilesService.newProfile(result)
+            } else {
+                await this.profilesService.writeProfile(result)
+            }
+            await this.config.save()
+        }
     }
 
-    async showProfileEditModal (profile: PartialProfile<Profile>): Promise<PartialProfile<Profile>|null> {
+    async showProfileEditModal (profile: PartialProfile<Profile>): Promise<PartialProfile<Profile>|{ action: 'delete' | 'duplicate', profile: PartialProfile<Profile> }|null> {
         const modal = this.ngbModal.open(
             EditProfileModalComponent,
             { size: 'lg' },
@@ -131,6 +150,10 @@ export class ProfilesSettingsTabComponent extends BaseComponent {
         const result = await modal.result.catch(() => null)
         if (!result) {
             return null
+        }
+
+        if ('action' in result) {
+            return result
         }
 
         result.type = provider.id

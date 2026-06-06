@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import deepClone from 'clone-deep'
 import { Observable, OperatorFunction, debounceTime, map, distinctUntilChanged } from 'rxjs'
 import { Component, Input, ViewChild, ViewContainerRef, ComponentFactoryResolver, Injector } from '@angular/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { PartialProfileGroup, Profile, ProfileProvider, ProfileSettingsComponent, ProfilesService, TAB_COLORS, ProfileGroup, ConnectableProfileProvider, FullyDefined, ConfigProxy } from 'tabby-core'
+import { PartialProfileGroup, Profile, ProfileProvider, ProfileSettingsComponent, ProfilesService, TAB_COLORS, ProfileGroup, ConnectableProfileProvider, FullyDefined, ConfigProxy, NotificationsService, PlatformService, TranslateService, ConfigService } from 'tabby-core'
 
 const iconsData = require('../../../tabby-core/src/icons.json')
 const iconsClassList = Object.keys(iconsData).map(
@@ -32,6 +33,10 @@ export class EditProfileModalComponent<P extends Profile, PP extends ProfileProv
         private componentFactoryResolver: ComponentFactoryResolver,
         private profilesService: ProfilesService,
         private modalInstance: NgbActiveModal,
+        private notifications: NotificationsService,
+        private platform: PlatformService,
+        private translate: TranslateService,
+        private config: ConfigService,
     ) {
         if (this.defaultsMode === 'disabled') {
             this.profilesService.getProfileGroups().then(groups => {
@@ -101,6 +106,41 @@ export class EditProfileModalComponent<P extends Profile, PP extends ProfileProv
 
     cancel () {
         this.modalInstance.dismiss()
+    }
+
+    async delete (): Promise<void> {
+        if (!this.partialProfile.id) {
+            this.notifications.info('Invalid action')
+            return
+        }
+        const confirmed = (await this.platform.showMessageBox({
+            type: 'warning',
+            message: this.translate.instant('Delete "{name}"?', this.partialProfile),
+            buttons: [
+                this.translate.instant('Delete'),
+                this.translate.instant('Keep'),
+            ],
+            defaultId: 1,
+            cancelId: 1,
+        })).response === 0
+        if (!confirmed) {
+            return
+        }
+        await this.profilesService.deleteProfile(this.partialProfile)
+        await this.config.save()
+        this.modalInstance.close({ action: 'delete', profile: this.partialProfile })
+    }
+
+    async duplicate (): Promise<void> {
+        if (!this.partialProfile.id) {
+            this.notifications.info('Invalid action')
+            return
+        }
+        const duplicated = deepClone(this.partialProfile)
+        duplicated.id = ''
+        duplicated.name = `${this.partialProfile.name} copy`
+        this.profile.__cleanup()
+        this.modalInstance.close({ action: 'duplicate', profile: duplicated })
     }
 
     isConnectable (): boolean {
