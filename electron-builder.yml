@@ -41,6 +41,11 @@ asarUnpack:
 win:
   icon: "./build/windows/icon.ico"
   artifactName: tabby-${version}-portable-${env.ARCH}.${ext}
+  extraFiles:
+  - from: app/vc-runtime
+    to: .
+    filter:
+    - "*.dll"
   signtoolOptions:
     rfc3161TimeStampServer: http://timestamp.sectigo.com
 nsis:
