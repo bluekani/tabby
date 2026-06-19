@@ -400,14 +400,10 @@ jobs:
           curl -sSL -o build/vc_redist.exe "https://aka.ms/vs/17/release/vc_redist.x64.exe"
         fi
         ls -la build/vc_redist.exe
-    - name: Build
+
+    - name: Copy VC Runtime DLLs
       shell: powershell
       run: |
-        npm i -g yarn node-gyp
-        yarn --network-timeout 1000000
-        yarn run build
-        node scripts/prepackage-plugins.mjs
-        
         # Copy VC runtime DLLs for both x64 and arm64
         $arch = if ("$env:ARCH" -eq "x64") { "x64" } else { "arm64" }
         $crtDir = Get-ChildItem "C:\Program Files\Microsoft Visual Studio\2022\*\VC\Redist\MSVC\*\$arch\Microsoft.VC*.CRT" -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
@@ -420,6 +416,16 @@ jobs:
             }
           }
         }
+      env:
+        ARCH: ${{matrix.arch}}
+
+    - name: Build
+      shell: powershell
+      run: |
+        npm i -g yarn node-gyp
+        yarn --network-timeout 1000000
+        yarn run build
+        node scripts/prepackage-plugins.mjs
       env:
         ARCH: ${{matrix.arch}}
 
