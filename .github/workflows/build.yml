@@ -404,14 +404,15 @@ jobs:
     - name: Copy VC Runtime DLLs
       shell: powershell
       run: |
-        # Copy VC runtime DLLs for both x64 and arm64
+        # Copy VC runtime DLLs for both x64 and arm64 for portable package
+        mkdir "app/vc-runtime" -Force | Out-Null
         $arch = if ("$env:ARCH" -eq "x64") { "x64" } else { "arm64" }
         $crtDir = Get-ChildItem "C:\Program Files\Microsoft Visual Studio\2022\*\VC\Redist\MSVC\*\$arch\Microsoft.VC*.CRT" -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
         if ($crtDir) {
           @("vcruntime140.dll", "vcruntime140_1.dll", "msvcp140.dll") | ForEach-Object {
             $src = Join-Path $crtDir.FullName $_
             if (Test-Path $src) { 
-              Copy-Item $src "app/"
+              Copy-Item $src "app/vc-runtime/"
               Write-Host "Copied $_ from VS 2022: $src"
             }
           }

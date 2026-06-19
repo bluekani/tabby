@@ -42,12 +42,10 @@ win:
   icon: "./build/windows/icon.ico"
   artifactName: tabby-${version}-portable-${env.ARCH}.${ext}
   extraFiles:
-  - from: app
+  - from: app/vc-runtime
     to: .
     filter:
-    - vcruntime140.dll
-    - vcruntime140_1.dll
-    - msvcp140.dll
+    - "*.dll"
   signtoolOptions:
     rfc3161TimeStampServer: http://timestamp.sectigo.com
 nsis:
@@ -56,6 +54,8 @@ nsis:
   installerIcon: "./build/windows/icon.ico"
   allowToChangeInstallationDirectory: true
   shortcutName: Tabby Terminal
+  files:
+  - '!app/vc-runtime'
 mac:
   category: public.app-category.utilities
   icon: "./build/mac/icon.icns"
