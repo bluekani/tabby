@@ -42,7 +42,12 @@ win:
   icon: "./build/windows/icon.ico"
   artifactName: tabby-${version}-portable-${env.ARCH}.${ext}
   extraResources:
-  - app/*.dll
+  - from: app
+    to: .
+    filter:
+    - vcruntime140.dll
+    - vcruntime140_1.dll
+    - msvcp140.dll
   signtoolOptions:
     rfc3161TimeStampServer: http://timestamp.sectigo.com
 nsis:
