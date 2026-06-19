@@ -479,6 +479,7 @@ jobs:
         # Add VC Runtime DLLs to portable zip
         $portableZip = Get-ChildItem dist/*-portable-*.zip | Select-Object -First 1
         if ($portableZip) {
+          Add-Type -AssemblyName System.IO.Compression
           Add-Type -AssemblyName System.IO.Compression.FileSystem
 
           # Open zip in update mode and add DLL files
