@@ -41,7 +41,7 @@ asarUnpack:
 win:
   icon: "./build/windows/icon.ico"
   artifactName: tabby-${version}-portable-${env.ARCH}.${ext}
-  extraResources:
+  extraFiles:
   - from: app
     to: .
     filter:
