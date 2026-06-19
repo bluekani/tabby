@@ -3,6 +3,8 @@
 import { build as builder } from 'electron-builder'
 import * as vars from './vars.mjs'
 import { execSync } from 'child_process'
+import fs from 'fs'
+import path from 'path'
 
 const isTag = (process.env.GITHUB_REF || process.env.BUILD_SOURCEBRANCH || '').startsWith('refs/tags/')
 const keypair = process.env.SM_KEYPAIR_ALIAS
@@ -11,9 +13,8 @@ process.env.ARCH = process.env.ARCH || process.arch
 
 console.log('Signing enabled:', !!keypair)
 
-builder({
+const buildConfig = {
     dir: true,
-    win: ['nsis', 'zip'],
     arm64: process.env.ARCH === 'arm64',
     config: {
         extraMetadata: {
@@ -59,9 +60,24 @@ builder({
             },
         },
     },
-
     publish: (process.env.KEYGEN_TOKEN && isTag) ? 'always' : 'never',
-}).catch(e => {
+}
+
+try {
+    // Build portable ZIP
+    await builder({ ...buildConfig, win: ['zip'] })
+
+    // Remove vc-runtime folder for installer build
+    const vcRuntimePath = path.join('app', 'vc-runtime')
+    if (fs.existsSync(vcRuntimePath)) {
+        fs.rmSync(vcRuntimePath, { recursive: true, force: true })
+        console.log('Removed vc-runtime folder')
+    }
+
+    // Build NSIS installer
+    await builder({ ...buildConfig, win: ['nsis'] })
+
+} catch (e) {
     console.error(e)
     process.exit(1)
-})
+}
