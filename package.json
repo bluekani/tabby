@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "@angular/animations": "^15.2.6",
+    "@angular/build": "^18.2.21",
     "@angular/cdk": "^15.2.6",
     "@angular/common": "^15.2.6",
     "@angular/compiler": "^15.2.6",
@@ -17,6 +18,8 @@
     "@ng-bootstrap/ng-bootstrap": "^14.1.0",
     "@ngtools/webpack": "^15.2.5",
     "@popperjs/core": "^2.11.6",
+    "@rspack/cli": "^2.0.8",
+    "@rspack/core": "^2.0.8",
     "@sentry/cli": "^2.18.1",
     "@sentry/electron": "^2.5.4",
     "@tabby-gang/to-string-loader": "^1.1.7-beta.2",
@@ -90,7 +93,7 @@
   "scripts": {
     "build": "npm run build:typings && node scripts/build-modules.mjs",
     "build:typings": "node scripts/build-typings.mjs",
-    "watch": "cross-env TABBY_DEV=1 webpack --progress --color --watch",
+    "watch": "cross-env TABBY_DEV=1 rspack --progress --color --watch",
     "start": "cross-env TABBY_DEV=1 electron app -d --inspect",
     "start:prod": "electron app --debug",
     "prod": "cross-env TABBY_DEV=1 electron app",

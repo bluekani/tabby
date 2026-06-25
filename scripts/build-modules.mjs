@@ -1,20 +1,24 @@
 #!/usr/bin/env node
 import * as vars from './vars.mjs'
 import log from 'npmlog'
+import rspack from '@rspack/core'
 import webpack from 'webpack'
 import { promisify } from 'node:util'
 
 const configs = [
     '../app/webpack.config.main.mjs',
     '../app/webpack.config.mjs',
-    ...vars.allPackages.map(x => `../${x}/webpack.config.mjs`),
-];
+    ...vars.builtinPlugins.map(x => `../${x}/webpack.config.mjs`),
+]
+
+const isWebpack = c => webpackOnly.some(p => c.includes(p))
 
 (async () => {
     try {
         for (const c of configs) {
             log.info('build', c)
-            const stats = await promisify(webpack)((await import(c)).default())
+            const builder = isWebpack(c) ? webpack : rspack
+            const stats = await promisify(builder)((await import(c)).default())
             console.log(stats.toString({ colors: true }))
             if (stats.hasErrors()) {
                 process.exit(1)
