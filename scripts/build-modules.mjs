@@ -5,9 +5,13 @@ import rspack from '@rspack/core'
 import webpack from 'webpack'
 import { promisify } from 'node:util'
 
-const configs = [
+const webpackOnly = [
     '../app/webpack.config.main.mjs',
     '../app/webpack.config.mjs',
+]
+
+const configs = [
+    ...webpackOnly,
     ...vars.builtinPlugins.map(x => `../${x}/webpack.config.mjs`),
 ]
 
