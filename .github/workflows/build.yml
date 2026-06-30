@@ -6,12 +6,12 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
 
     - name: Installing Node
-      uses: actions/setup-node@v4.4.0
+      uses: actions/setup-node@v5
       with:
         node-version: 22
 
@@ -49,12 +49,12 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
 
     - name: Installing Node
-      uses: actions/setup-node@v4.4.0
+      uses: actions/setup-node@v5
       with:
         node-version: 22
 
@@ -161,12 +161,12 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
 
     - name: Install Node
-      uses: actions/setup-node@v4.4.0
+      uses: actions/setup-node@v5
       with:
         node-version: 22
 
@@ -318,7 +318,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
 
@@ -380,7 +380,7 @@ jobs:
         Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits" -Filter "signtool.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
 
     - name: Installing Node
-      uses: actions/setup-node@v4.4.0
+      uses: actions/setup-node@v5
       with:
         node-version: 22
 
