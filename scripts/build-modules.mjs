@@ -12,14 +12,14 @@ const configs = [
 
 (async () => {
     try {
-        for (const c of configs) {
+        await Promise.all(configs.map(async (c) => {
             log.info('build', c)
             const stats = await promisify(webpack)((await import(c)).default())
             console.log(stats.toString({ colors: true }))
             if (stats.hasErrors()) {
                 process.exit(1)
             }
-        }
+        }))
     } catch (error) {
         log.error('build', String(error))
         process.exit(1)
