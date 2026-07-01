@@ -387,9 +387,10 @@ jobs:
     - run: rustup target add ${{matrix.rust_triple}}
 
     - name: Update node-gyp
+      shell: powershell
       run: |
         npm install --global node-gyp@10.2.0
-        npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
+        echo "npm_config_node_gyp=$(npm prefix -g)\node_modules\node-gyp\bin\node-gyp.js" >> $env:GITHUB_ENV
 
     - name: Download Visual C++ Redistributable
       shell: bash
@@ -400,13 +401,23 @@ jobs:
           curl -sSL -o build/vc_redist.exe "https://aka.ms/vs/17/release/vc_redist.x64.exe"
         fi
         ls -la build/vc_redist.exe
-    - name: Build
+    - name: Install npm_modules
       shell: powershell
       run: |
         npm i -g yarn node-gyp
         yarn --network-timeout 1000000
-        yarn run build
-        node scripts/prepackage-plugins.mjs
+      env:
+        ARCH: ${{matrix.arch}}
+
+    - name: Webpack
+      shell: powershell
+      run: yarn run build
+      env:
+        ARCH: ${{matrix.arch}}
+
+    - name: Prepackage plugins
+      shell: powershell
+      run: node scripts/prepackage-plugins.mjs
       env:
         ARCH: ${{matrix.arch}}
 
