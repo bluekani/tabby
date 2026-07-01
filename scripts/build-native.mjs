@@ -31,17 +31,20 @@ for (let dir of ['app', 'tabby-core', 'tabby-local', 'tabby-ssh', 'tabby-termina
         process.exit(1)
     })
 
+    const moduleTimers = new Map()
+
     build.lifecycle.on('module-found', name => {
-        const mStart = Date.now()
-        const lc = build.lifecycle
-        const captureName = name
-        lc.on('module-done', () => {
-            console.info(`  ${captureName} ${ms(Date.now() - mStart)}`)
-        })
-        lc.on('module-skip', () => {
-            console.info(`  ${captureName} skipped`)
-        })
+        moduleTimers.set(name, Date.now())
         process.stdout.write(`[${dir}] ${name}... `)
+    })
+
+    build.lifecycle.on('module-done', name => {
+        const elapsed = Date.now() - moduleTimers.get(name)
+        console.info(`${ms(elapsed)}`)
+    })
+
+    build.lifecycle.on('module-skip', name => {
+        console.info(`skipped`)
     })
 
     await build
