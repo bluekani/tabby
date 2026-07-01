@@ -312,6 +312,8 @@ jobs:
     env:
       RUST_TARGET_TRIPLE: ${{matrix.rust_triple}}
       ARCH: ${{matrix.arch}}
+      npm_config_arch: ${{matrix.arch}}
+      npm_config_target_arch: ${{matrix.arch}}
       # Branch name that enables DigiCert signing in PR builds for debugging.
       # Change this value to match the feature branch you want to test signing on.
       SIGN_ON_BRANCH: signing-debug
