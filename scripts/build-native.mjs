@@ -13,25 +13,39 @@ if (process.platform === 'win32' || process.platform === 'linux') {
     process.env.ARCH ??= process.arch
 }
 
-let lifecycles = []
+const overallStart = Date.now()
+
+function ms(n) {
+    return n < 1000 ? `${n}ms` : `${(n / 1000).toFixed(1)}s`
+}
+
 for (let dir of ['app', 'tabby-core', 'tabby-local', 'tabby-ssh', 'tabby-terminal']) {
+    const dirStart = Date.now()
     const build = rebuild({
         buildPath: path.resolve(__dirname, '../' + dir),
         electronVersion: vars.electronVersion,
         arch: process.env.ARCH,
-        force: true,
     })
     build.catch(e => {
         console.error(e)
         process.exit(1)
     })
-    lifecycles.push([build.lifecycle, dir])
-}
 
-console.info('Building against Electron', vars.electronVersion)
-
-for (let [lc, dir] of lifecycles) {
-    lc.on('module-found', name => {
-        console.info('Rebuilding', dir + '/' + name)
+    build.lifecycle.on('module-found', name => {
+        const mStart = Date.now()
+        const lc = build.lifecycle
+        const captureName = name
+        lc.on('module-done', () => {
+            console.info(`  ${captureName} ${ms(Date.now() - mStart)}`)
+        })
+        lc.on('module-skip', () => {
+            console.info(`  ${captureName} skipped`)
+        })
+        process.stdout.write(`[${dir}] ${name}... `)
     })
+
+    await build
+    console.info(`[${dir}] done ${ms(Date.now() - dirStart)}`)
 }
+
+console.info(`\nTotal: ${ms(Date.now() - overallStart)}`)
