@@ -66,6 +66,7 @@ jobs:
         path: |
           node_modules
           app/node_modules
+          tabby-*/node_modules
         key: ${{ runner.os }}-${{ matrix.arch }}-yarn-${{ hashFiles('**/yarn.lock') }}
         restore-keys: ${{ runner.os }}-${{ matrix.arch }}-yarn-
 
@@ -185,6 +186,7 @@ jobs:
         path: |
           node_modules
           app/node_modules
+          tabby-*/node_modules
         key: ${{ runner.os }}-${{ matrix.build-arch }}-yarn-${{ hashFiles('**/yarn.lock') }}
         restore-keys: ${{ runner.os }}-${{ matrix.build-arch }}-yarn-
 
@@ -412,6 +414,7 @@ jobs:
         path: |
           node_modules
           app/node_modules
+          tabby-*/node_modules
         key: ${{ runner.os }}-${{ matrix.arch }}-yarn-${{ hashFiles('**/yarn.lock') }}
         restore-keys: ${{ runner.os }}-${{ matrix.arch }}-yarn-
 
