@@ -7,7 +7,6 @@ log.info('patch')
 sh.exec(`yarn patch-package`, { fatal: true })
 
 log.info('deps', 'app')
-
 sh.cd('app')
 sh.exec(`yarn install --network-timeout 1000000 --ignore-scripts`, { fatal: true })
 sh.exec(`yarn patch-package`, { fatal: true })
@@ -23,7 +22,6 @@ vars.allPackages.forEach(plugin => {
     log.info('deps', plugin)
     sh.cd(plugin)
     sh.exec(`yarn install --network-timeout 1000000 --ignore-scripts`, { fatal: true })
-    sh.exec(`yarn patch-package`, { fatal: true })
     sh.cd('..')
 })
 

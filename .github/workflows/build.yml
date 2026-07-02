@@ -87,7 +87,7 @@ jobs:
     - run: sed -i '' 's/updateInfo = await/\/\/updateInfo = await/g' node_modules/app-builder-lib/out/targets/ArchiveTarget.js
 
     # Work around electron-builder beta bug
-    - run: ln -s ../../node_modules/electron app/node_modules
+    - run: ln -sf ../../node_modules/electron app/node_modules
 
     - name: Build and sign packages
       run: scripts/build-macos.mjs
@@ -332,8 +332,6 @@ jobs:
     env:
       RUST_TARGET_TRIPLE: ${{matrix.rust_triple}}
       ARCH: ${{matrix.arch}}
-      npm_config_arch: ${{matrix.arch}}
-      npm_config_target_arch: ${{matrix.arch}}
       # Branch name that enables DigiCert signing in PR builds for debugging.
       # Change this value to match the feature branch you want to test signing on.
       SIGN_ON_BRANCH: signing-debug
