@@ -13,6 +13,7 @@ if (process.platform === 'win32' || process.platform === 'linux') {
     process.env.ARCH ??= process.arch
 }
 
+let lifecycles = []
 for (let dir of ['app', 'tabby-core', 'tabby-local', 'tabby-ssh', 'tabby-terminal']) {
     const build = rebuild({
         buildPath: path.resolve(__dirname, '../' + dir),
@@ -23,18 +24,13 @@ for (let dir of ['app', 'tabby-core', 'tabby-local', 'tabby-ssh', 'tabby-termina
         console.error(e)
         process.exit(1)
     })
+    lifecycles.push([build.lifecycle, dir])
+}
 
-    build.lifecycle.on('module-found', name => {
-        process.stdout.write(`[${dir}] ${name}... `)
+console.info('Building against Electron', vars.electronVersion)
+
+for (let [lc, dir] of lifecycles) {
+    lc.on('module-found', name => {
+        console.info('Rebuilding', dir + '/' + name)
     })
-
-    build.lifecycle.on('module-done', name => {
-        console.info('done')
-    })
-
-    build.lifecycle.on('module-skip', name => {
-        console.info('skipped')
-    })
-
-    await build
 }
