@@ -35,6 +35,7 @@ vars.allPackages.forEach(plugin => {
     const pluginStart = Date.now()
     sh.cd(plugin)
     sh.exec(`yarn install --force --network-timeout 1000000 --ignore-scripts`, { fatal: true })
+    sh.exec(`yarn patch-package`, { fatal: true })
     sh.cd('..')
     console.info(`[${plugin}] ${ms(Date.now() - pluginStart)}`)
 })
