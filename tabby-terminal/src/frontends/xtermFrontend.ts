@@ -107,7 +107,6 @@ export class XTermFrontend extends Frontend {
         this.xterm = new Terminal({
             allowTransparency: true,
             allowProposedApi: true,
-            overviewRulerWidth: 8,
             windowsPty: process.platform === 'win32' ? {
                 backend: this.configService.store.terminal.useConPTY ? 'conpty' : 'winpty',
                 buildNumber: getWindows10Build(),
@@ -214,21 +213,49 @@ export class XTermFrontend extends Frontend {
 
         this.resizeHandler = () => {
             try {
-                if (this.xterm.element && getComputedStyle(this.xterm.element).getPropertyValue('height') !== 'auto') {
-                    const savedPinned = this.pinnedToBottom
-                    const savedViewportY = this.xterm.buffer.active.viewportY
+                if (!this.opened || !this.xterm.element || getComputedStyle(this.xterm.element).getPropertyValue('height') === 'auto') {
+                    return
+                }
 
+                const savedPinned = this.pinnedToBottom
+                const savedViewportY = this.xterm.buffer.active.viewportY
+
+                try {
                     this.fitAddon.fit()
-                    this.xtermCore.viewport._refresh()
-
-                    if (savedPinned) {
-                        this.xtermCore._scrollToBottom()
-                    } else {
-                        // Restore the previous scroll position after fit
-                        const maxScroll = this.xterm.buffer.active.baseY
-                        const targetY = Math.min(savedViewportY, maxScroll)
-                        this.xterm.scrollToLine(targetY)
+                } catch (fitError) {
+                    // xterm 6.x FitAddon may fail if internal APIs changed
+                    // Fallback: manually resize using element dimensions
+                    try {
+                        const element = this.xterm.element
+                        if (element) {
+                            const style = getComputedStyle(element)
+                            const width = parseInt(style.width) || element.clientWidth
+                            const height = parseInt(style.height) || element.clientHeight
+                            const cellWidth = this.xterm['_core']?._charSizeService?.width || 9
+                            const cellHeight = this.xterm['_core']?._charSizeService?.height || 17
+                            const cols = Math.floor(width / cellWidth)
+                            const rows = Math.floor(height / cellHeight)
+                            if (cols > 0 && rows > 0) {
+                                this.xterm.resize(cols, rows)
+                            }
+                        }
+                    } catch (fallbackError) {
+                        // ignore fallback errors
                     }
+                }
+
+                // viewport._refresh() - check if viewport exists in xterm 6.x
+                if (this.xtermCore.viewport?._refresh) {
+                    this.xtermCore.viewport._refresh()
+                }
+
+                if (savedPinned) {
+                    this.xtermCore._scrollToBottom()
+                } else {
+                    // Restore the previous scroll position after fit
+                    const maxScroll = this.xterm.buffer.active.baseY
+                    const targetY = Math.min(savedViewportY, maxScroll)
+                    this.xterm.scrollToLine(targetY)
                 }
             } catch (e) {
                 // tends to throw when element wasn't shown yet
@@ -522,9 +549,7 @@ export class XTermFrontend extends Frontend {
             }
         })
 
-        this.xtermCore.browser.isWindows = this.hostApp.platform === Platform.Windows
-        this.xtermCore.browser.isLinux = this.hostApp.platform === Platform.Linux
-        this.xtermCore.browser.isMac = this.hostApp.platform === Platform.macOS
+        // Note: browser.isWindows/isLinux/isMac removed in xterm 6.x as they're now read-only
 
         this.xterm.options.fontFamily = getCSSFontFamily(config)
         this.xterm.options.cursorStyle = {

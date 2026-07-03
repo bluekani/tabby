@@ -81,6 +81,10 @@ export class Session extends BaseSession {
         this.vm.serial0_send(data.toString())
     }
 
+    clear (): void {
+        // Web demo doesn't have PTY clear - this is a no-op
+    }
+
     kill (_signal?: string): void {
     }
 

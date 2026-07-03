@@ -94,6 +94,10 @@ export class ElectronPTYProxy extends PTYProxy {
         ipcRenderer.send('pty:write', this.id, data)
     }
 
+    async clear (): Promise<void> {
+        ipcRenderer.send('pty:clear', this.id)
+    }
+
     async kill (signal?: string): Promise<void> {
         ipcRenderer.send('pty:kill', this.id, signal)
     }

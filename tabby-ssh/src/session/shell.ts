@@ -85,6 +85,10 @@ export class SSHShellSession extends BaseSession {
         }
     }
 
+    clear (): void {
+        // SSH doesn't have a PTY clear - this is a no-op
+    }
+
     kill (_signal?: string): void {
         // this.shell?.signal(signal ?? 'TERM')
     }

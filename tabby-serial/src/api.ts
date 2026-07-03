@@ -139,6 +139,10 @@ export class SerialSession extends BaseSession {
         this.serial?.write(data)
     }
 
+    clear (): void {
+        // Serial doesn't have PTY clear - this is a no-op
+    }
+
     async destroy (): Promise<void> {
         this.serviceMessage.complete()
         await super.destroy()

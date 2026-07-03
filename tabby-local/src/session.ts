@@ -164,6 +164,10 @@ export class Session extends BaseSession {
         }
     }
 
+    clear (): void {
+        this.pty?.clear()
+    }
+
     kill (signal?: string): void {
         this.pty?.kill(signal)
     }

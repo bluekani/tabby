@@ -267,6 +267,10 @@ export class TelnetSession extends BaseSession {
         this.socket.write(data)
     }
 
+    clear (): void {
+        // Telnet doesn't have PTY clear - this is a no-op
+    }
+
     kill (_signal?: string): void {
         this.socket.destroy()
     }

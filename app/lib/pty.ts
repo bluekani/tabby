@@ -124,6 +124,12 @@ export class PTY {
         }
     }
 
+    clear (): void {
+        if ((this.pty as any)._writable) {
+            (this.pty as any).clear()
+        }
+    }
+
     ackData (length: number): void {
         this.outputQueue.ack(length)
     }
@@ -161,6 +167,10 @@ export class PTYManager {
 
         ipcMain.on('pty:write', (_event, id, data) => {
             this.ptys[id]?.write(Buffer.from(data))
+        })
+
+        ipcMain.on('pty:clear', (_event, id) => {
+            this.ptys[id]?.clear()
         })
 
         ipcMain.on('pty:kill', (_event, id, signal) => {

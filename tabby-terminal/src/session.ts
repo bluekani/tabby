@@ -87,6 +87,7 @@ export abstract class BaseSession {
     abstract start (options: unknown): Promise<void>
     abstract resize (columns: number, rows: number): void
     abstract write (data: Buffer): void
+    abstract clear (): void
     abstract kill (signal?: string): void
     abstract gracefullyKillProcess (): Promise<void>
     abstract supportsWorkingDirectory (): boolean
