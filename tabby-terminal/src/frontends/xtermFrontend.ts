@@ -227,17 +227,15 @@ export class XTermFrontend extends Frontend {
                     // Fallback: manually resize using element dimensions
                     try {
                         const element = this.xterm.element
-                        if (element) {
-                            const style = getComputedStyle(element)
-                            const width = parseInt(style.width) || element.clientWidth
-                            const height = parseInt(style.height) || element.clientHeight
-                            const cellWidth = this.xterm['_core']?._charSizeService?.width || 9
-                            const cellHeight = this.xterm['_core']?._charSizeService?.height || 17
-                            const cols = Math.floor(width / cellWidth)
-                            const rows = Math.floor(height / cellHeight)
-                            if (cols > 0 && rows > 0) {
-                                this.xterm.resize(cols, rows)
-                            }
+                        const style = getComputedStyle(element)
+                        const width = parseInt(style.width) || element.clientWidth
+                        const height = parseInt(style.height) || element.clientHeight
+                        const cellWidth = this.xterm['_core']?._charSizeService?.width || 9
+                        const cellHeight = this.xterm['_core']?._charSizeService?.height || 17
+                        const cols = Math.floor(width / cellWidth)
+                        const rows = Math.floor(height / cellHeight)
+                        if (cols > 0 && rows > 0) {
+                            this.xterm.resize(cols, rows)
                         }
                     } catch (fallbackError) {
                         // ignore fallback errors
