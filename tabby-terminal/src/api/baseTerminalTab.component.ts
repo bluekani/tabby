@@ -258,8 +258,8 @@ export class BaseTerminalTabComponent<P extends BaseTerminalProfile> extends Bas
                     break
                 case 'clear':
                     this.forEachFocusedTerminalPane(tab => {
-                        tab.frontend?.clear()
                         tab.session?.clear()
+                        tab.frontend?.clear()
                     })
                     break
                 case 'zoom-in':
