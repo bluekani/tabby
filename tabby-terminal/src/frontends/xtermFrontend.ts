@@ -107,6 +107,7 @@ export class XTermFrontend extends Frontend {
         this.xterm = new Terminal({
             allowTransparency: true,
             allowProposedApi: true,
+            scrollOnEraseInDisplay: true,
             windowsPty: process.platform === 'win32' ? {
                 backend: this.configService.store.terminal.useConPTY ? 'conpty' : 'winpty',
                 buildNumber: getWindows10Build(),
@@ -458,6 +459,12 @@ export class XTermFrontend extends Frontend {
     }
 
     clear (): void {
+        // VS Code uses xterm.clear() which:
+        // 1. Clears all markers
+        // 2. Moves cursor line to top
+        // 3. Resets ydisp/ybase/y to 0
+        // 4. Fills viewport with blank lines
+        // Note: xterm.js does not clear the first prompt line
         this.xterm.clear()
     }
 

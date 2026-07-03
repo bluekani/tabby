@@ -95,7 +95,11 @@ export class ElectronPTYProxy extends PTYProxy {
     }
 
     async clear (): Promise<void> {
-        ipcRenderer.send('pty:clear', this.id)
+        // Send escape sequence to clear the PTY buffer.
+        // ESC [ 2 J = Erase in Display (clear entire screen including scrollback)
+        // ESC [ H = Cursor to home
+        // This works with ConPTY unlike node-pty's clear() method
+        this.write(Buffer.from('\x1b[2J\x1b[H'))
     }
 
     async kill (signal?: string): Promise<void> {
