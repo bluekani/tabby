@@ -192,14 +192,8 @@ export class Window {
         }
         if (process.platform === 'win32') {
             if (parseFloat(os.release()) >= 10) {
-                // For Win11, use acrylic by default if type is undefined
-                const blurType = enabled
-                    ? type === 'fluent'
-                        ? 'acrylic'
-                        : type === 'blur'
-                            ? 'blurbehind'
-                            : 'acrylic'
-                    : null
+                // Win11 only supports acrylic via SystemBackdrop API, blurbehind is deprecated
+                const blurType = enabled ? 'acrylic' : null
                 console.debug('[Tabby/Window] Setting blurType, type input:', type, '-> result:', blurType)
                 this.window.blurType = blurType
                 try {
