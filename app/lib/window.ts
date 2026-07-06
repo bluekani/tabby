@@ -186,12 +186,22 @@ export class Window {
     }
 
     setVibrancy (enabled: boolean, type?: string, userRequested?: boolean): void {
+        console.debug('[Tabby/Window] setVibrancy called:', { enabled, type, userRequested })
         if (userRequested ?? true) {
             this.lastVibrancy = { enabled, type }
         }
         if (process.platform === 'win32') {
             if (parseFloat(os.release()) >= 10) {
-                this.window.blurType = enabled ? type === 'fluent' ? 'acrylic' : 'blurbehind' : null
+                // For Win11, use acrylic by default if type is undefined
+                const blurType = enabled
+                    ? type === 'fluent'
+                        ? 'acrylic'
+                        : type === 'blur'
+                            ? 'blurbehind'
+                            : 'acrylic'
+                    : null
+                console.debug('[Tabby/Window] Setting blurType, type input:', type, '-> result:', blurType)
+                this.window.blurType = blurType
                 try {
                     this.window.setBlur(enabled)
                     this.isFluentVibrancy = enabled && type === 'fluent'
