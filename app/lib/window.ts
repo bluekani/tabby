@@ -22,10 +22,13 @@ export interface WindowOptions {
     hidden?: boolean
 }
 
-abstract class GlasstronWindow extends BrowserWindow {
-    blurType: string
-    abstract setBlur (_: boolean)
+type GlasstronWindow = BrowserWindow & {
+    blurType?: string | null
+    setBlur?: (_: boolean) => void
 }
+
+const windowsBuildNumber = process.platform === 'win32' ? Number(os.release().split('.')[2] ?? 0) : 0
+const isWindows11 = process.platform === 'win32' && windowsBuildNumber >= 22621
 
 const macOSVibrancyType: any = process.platform === 'darwin' ? compareVersions(macOSRelease().version || '0.0', '10.14', '>=') ? 'fullscreen-ui' : 'dark' : null
 
@@ -105,10 +108,10 @@ export class Window {
             bwOptions.visualEffectState = 'active'
         }
 
-        if (process.platform === 'darwin') {
+        if (process.platform === 'darwin' || isWindows11) {
             this.window = new BrowserWindow(bwOptions) as GlasstronWindow
         } else {
-            this.window = new glasstron.BrowserWindow(bwOptions)
+            this.window = new glasstron.BrowserWindow(bwOptions) as GlasstronWindow
         }
 
         this.webContents = this.window.webContents
@@ -191,19 +194,24 @@ export class Window {
         }
         if (process.platform === 'win32') {
             if (parseFloat(os.release()) >= 10) {
-                this.window.blurType = enabled ? type === 'fluent' ? 'acrylic' : 'blurbehind' : null
                 try {
-                    this.window.setBlur(enabled)
-                    this.isFluentVibrancy = enabled && type === 'fluent'
+                    if (isWindows11) {
+                        (this.window as any).setBackgroundMaterial(enabled ? 'acrylic' : 'none')
+                        this.isFluentVibrancy = enabled
+                    } else {
+                        this.window.blurType = enabled ? type === 'fluent' ? 'acrylic' : 'blurbehind' : null
+                        this.window.setBlur?.(enabled)
+                        this.isFluentVibrancy = enabled && type === 'fluent'
+                    }
                 } catch (error) {
-                    console.error('Failed to set window blur', error)
+                    console.error('Failed to set window vibrancy', error)
                 }
             } else {
                 DwmEnableBlurBehindWindow(this.window.getNativeWindowHandle(), enabled)
             }
         } else if (process.platform === 'linux') {
-            this.window.setBackgroundColor(enabled ? '#00000000' : '#131d27')
-            this.window.setBlur(enabled)
+            this.window.setBackgroundColor(enabled ? '#00000000' : '#131d27');
+            (this.window as any).setBlur?.(enabled)
         } else {
             this.window.setVibrancy(enabled ? macOSVibrancyType : null)
         }
@@ -374,6 +382,17 @@ export class Window {
 
         this.window.on('focus', () => {
             this.send('host:window-focused')
+            // Re-apply acrylic on Win11 when window gains focus
+            if (isWindows11 && this.lastVibrancy?.enabled) {
+                (this.window as any).setBackgroundMaterial('acrylic')
+            }
+        })
+
+        this.window.on('blur', () => {
+            // Re-apply acrylic on Win11 when window loses focus
+            if (isWindows11 && this.lastVibrancy?.enabled) {
+                (this.window as any).setBackgroundMaterial('acrylic')
+            }
         })
 
         this.on('ready', () => {
