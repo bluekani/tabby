@@ -382,6 +382,17 @@ export class Window {
 
         this.window.on('focus', () => {
             this.send('host:window-focused')
+            // Re-apply acrylic on Win11 when window gains focus
+            if (isWindows11 && this.lastVibrancy?.enabled) {
+                (this.window as any).setBackgroundMaterial('acrylic')
+            }
+        })
+
+        this.window.on('blur', () => {
+            // Re-apply acrylic on Win11 when window loses focus
+            if (isWindows11 && this.lastVibrancy?.enabled) {
+                (this.window as any).setBackgroundMaterial('acrylic')
+            }
         })
 
         this.on('ready', () => {
