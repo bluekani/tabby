@@ -22,12 +22,18 @@ export interface WindowOptions {
     hidden?: boolean
 }
 
-abstract class GlasstronWindow extends BrowserWindow {
-    blurType: string
-    abstract setBlur (_: boolean)
+type GlasstronWindow = BrowserWindow & {
+    blurType?: string | null
+    setBlur?: (_: boolean) => void
 }
 
 const macOSVibrancyType: any = process.platform === 'darwin' ? compareVersions(macOSRelease().version || '0.0', '10.14', '>=') ? 'fullscreen-ui' : 'dark' : null
+
+function getWindowsBuildNumber (): number {
+    const match = os.release().split('.')
+    return match.length >= 2 ? parseInt(match[2]) : 0
+}
+const isWindows11 = process.platform === 'win32' && getWindowsBuildNumber() >= 22621
 
 const activityIcon = nativeImage.createFromPath(`${app.getAppPath()}/assets/activity.png`)
 
@@ -105,7 +111,7 @@ export class Window {
             bwOptions.visualEffectState = 'active'
         }
 
-        if (process.platform === 'darwin') {
+        if (process.platform === 'darwin' || isWindows11) {
             this.window = new BrowserWindow(bwOptions) as GlasstronWindow
         } else {
             this.window = new glasstron.BrowserWindow(bwOptions)
@@ -192,15 +198,13 @@ export class Window {
         }
         if (process.platform === 'win32') {
             if (parseFloat(os.release()) >= 10) {
-                // Win11 only supports acrylic via SystemBackdrop API, blurbehind is deprecated
-                const blurType = enabled ? 'acrylic' : null
-                console.debug('[Tabby/Window] Setting blurType, type input:', type, '-> result:', blurType)
-                this.window.blurType = blurType
-                try {
-                    this.window.setBlur(enabled)
+                if (isWindows11) {
+                    (this.window as any).setBackgroundMaterial(enabled ? 'acrylic' : 'none')
+                    this.isFluentVibrancy = enabled
+                } else {
+                    this.window.blurType = enabled ? type === 'fluent' ? 'acrylic' : 'blurbehind' : null
+                    this.window.setBlur?.(enabled)
                     this.isFluentVibrancy = enabled && type === 'fluent'
-                } catch (error) {
-                    console.error('Failed to set window blur', error)
                 }
             } else {
                 DwmEnableBlurBehindWindow(this.window.getNativeWindowHandle(), enabled)
