@@ -4,7 +4,7 @@
     overflow-y: auto;
 
     &.vibrant {
-        background: rgba(var(--bs-dark-rgb), 0.55);
+        background: rgba(from var(--bs-dark-rgb) r g b / 0.55);
         backdrop-filter: blur(10px);
     }
 }

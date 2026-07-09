@@ -5,7 +5,7 @@ app-root {
     background: transparent;
 
     &.vibrant {
-        background: rgba(var(--bs-dark-rgb),.65);
+        background: rgba(from var(--bs-dark-rgb) r g b / .65);
     }
 
     .main.content {
@@ -430,10 +430,11 @@ start-page {
 }
 
 split-tab-spanner {
-    background: rgba(var(--bs-dark-rgb), .1);
+    background: rgba(from var(--bs-dark-rgb) r g b / .1);
+
 
     &:hover, &.active {
-        background: rgba(var(--bs-dark-rgb), .2);
+        background: rgba(from var(--bs-dark-rgb) r g b / .2);
     }
 }
 
