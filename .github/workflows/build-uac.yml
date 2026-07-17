@@ -12,6 +12,9 @@ on:
       - 'tabby-uac/**'
       - '.github/workflows/build-uac.yml'
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-2022
@@ -37,6 +40,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
           git add extras/UAC.exe
           
           # Check if there are changes to commit
@@ -44,8 +48,6 @@ jobs:
             Write-Host "No changes to commit"
           } else {
             git commit -m "chore(UAC): build UAC.exe from tabby-uac"
-            git push
+            git push origin fix-uac-input-actions
           }
         shell: pwsh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
