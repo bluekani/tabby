@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - 'tabby-uac/**'
+      - '.github/workflows/build-uac.yml'
     branches:
     - '**'
   pull_request:
     paths:
       - 'tabby-uac/**'
+      - '.github/workflows/build-uac.yml'
 
 jobs:
   build:
