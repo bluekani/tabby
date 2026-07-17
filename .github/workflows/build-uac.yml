@@ -48,6 +48,7 @@ jobs:
             Write-Host "No changes to commit"
           } else {
             git commit -m "chore(UAC): build UAC.exe from tabby-uac"
-            git push origin fix-uac-input-actions
+            $branch = git rev-parse --abbrev-ref HEAD
+            git push origin $branch
           }
         shell: pwsh
