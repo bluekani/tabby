@@ -30,7 +30,7 @@ jobs:
 
       - name: Copy EXE to extras
         run: |
-          Copy-Item -Path "tabby-uac/UAC/x64/Release/UAC.exe" -Destination "extras/UAC.exe" -Force
+          Copy-Item -Path "tabby-uac/x64/Release/UAC.exe" -Destination "extras/UAC.exe" -Force
         shell: pwsh
 
       - name: Commit and push UAC.exe
