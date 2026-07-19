@@ -8,19 +8,19 @@ First of all, clone this repository.
 
 # Install Dependencies
 - [Node.js](https://nodejs.org/en/download/) **version 15 or newer*
-- [Yarn](https://yarnpkg.com/)
+- [pnpm](https://pnpm.io/)
 
-First, from within the `tabby` directory install the dependencies via yarn:
+First, from within the `tabby` directory install the dependencies via pnpm:
 
 ```
 # macOS & Windows:
-yarn
+pnpm install
 ```
 
 ```
 # Linux (Debian/Ubuntu here as an example)
 sudo apt install libfontconfig-dev libsecret-1-dev libarchive-tools libnss3 libatk1.0-0 libatk-bridge2.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 libgbm1 cmake
-yarn
+pnpm install
 ```
 
 _⚠️Note: If you forked this repository, you may need to pull down the tags from this repository before installing node modules. `git pull --tags upstream master`_
@@ -28,13 +28,13 @@ _⚠️Note: If you forked this repository, you may need to pull down the tags f
 Build Tabby:
 
 ```
-yarn run build
+pnpm run build
 ```
 
 Start Tabby
 
 ```
-yarn start
+pnpm start
 ```
 
 # Building an installer

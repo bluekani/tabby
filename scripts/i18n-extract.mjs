@@ -16,7 +16,7 @@ const tempHtml = 'locale/tmp-html'
     for (const plugin of vars.builtinPlugins) {
         log.info('compile-pug', plugin)
 
-        sh.exec(`yarn pug --doctype html -s --pretty -O '{require: function(){}}' -o ${tempHtml}/${plugin} ${plugin}`, { fatal: true })
+        sh.exec(`pnpm exec pug --doctype html -s --pretty -O '{require: function(){}}' -o ${tempHtml}/${plugin} ${plugin}`, { fatal: true })
     }
 
     log.info('extract-ts')

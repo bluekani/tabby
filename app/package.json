@@ -60,11 +60,5 @@
     "tabby-settings": "*",
     "tabby-ssh": "*",
     "tabby-terminal": "*"
-  },
-  "resolutions": {
-    "node-abi": "4.9.0",
-    "node-gyp": "^10.0.0",
-    "nan": "2.22.2",
-    "node-addon-api": "^8.3.0"
   }
 }

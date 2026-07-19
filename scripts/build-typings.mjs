@@ -5,7 +5,7 @@ import log from 'npmlog'
 
 for (const plugin of vars.builtinPlugins) {
     log.info('typings', plugin)
-    const result = sh.exec(`yarn tsc --project ${plugin}/tsconfig.typings.json`)
+    const result = sh.exec(`pnpm tsc --project ${plugin}/tsconfig.typings.json`)
     if (result.code !== 0) {
         process.exit(result.code)
     }

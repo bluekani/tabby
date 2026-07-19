@@ -5,5 +5,5 @@ import log from 'npmlog'
 
 vars.packagesWithDocs.forEach(([dest, src]) => {
     log.info('docs', src)
-    sh.exec(`yarn typedoc --out docs/api/${dest} --tsconfig ${src}/tsconfig.typings.json ${src}/src/index.ts`, { fatal: true })
+    sh.exec(`pnpm exec typedoc --out docs/api/${dest} --tsconfig ${src}/tsconfig.typings.json ${src}/src/index.ts`, { fatal: true })
 })
