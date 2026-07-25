@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@angular/core'
 import { Subject, Observable } from 'rxjs'
 import Color from 'color'
-type ColorInstance = InstanceType<typeof Color>
 import { ConfigService } from '../services/config.service'
 import { TerminalColorScheme, Theme } from '../api/theme'
 import { PlatformService, PlatformTheme } from '../api/platform'
@@ -173,16 +172,16 @@ export class ThemesService {
         document.body.classList.toggle('no-animations', !this.getConfigStoreOrDefaults().accessibility.animations)
     }
 
-    private ensureContrast (color: ColorInstance, against: ColorInstance): ColorInstance {
+    private ensureContrast (color: InstanceType<typeof Color>, against: InstanceType<typeof Color>): InstanceType<typeof Color> {
         const a = this.increaseContrast(color, against, 1.1)
         const b = this.increaseContrast(color, against, 0.9)
         return a.contrast(against) > b.contrast(against) ? a : b
     }
 
-    private increaseContrast (color: ColorInstance, against: ColorInstance, step=1.1): ColorInstance {
+    private increaseContrast (color: InstanceType<typeof Color>, against: InstanceType<typeof Color>, step=1.1): InstanceType<typeof Color> {
         const hsl = color.hsl().array()
         hsl[2] = Math.max(hsl[2], 0.01)
-        let current: ColorInstance = Color.hsl(hsl[0], hsl[1], hsl[2])
+        let current: InstanceType<typeof Color> = Color.hsl(hsl[0], hsl[1], hsl[2])
         while (
             (step < 1 && current.array()[2] > 1 ||
              step > 1 && current.array()[2] < 99) &&
