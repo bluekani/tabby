@@ -1,4 +1,3 @@
-// Rspack config for tabby-linkifier. See ../rspack.plugin.config.mjs for details.
 import * as url from 'url'
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 

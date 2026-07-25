@@ -1,19 +1,3 @@
-// Shared Rspack config for built-in Tabby plugins (tabby-ssh, tabby-linkifier, ...).
-//
-// Mirrors the API of webpack.plugin.config.mjs so that a plugin's
-// rspack.config.mjs is a near-clone of its webpack.config.mjs:
-//
-//   export default () => config({ name: 'ssh', dirname: __dirname })
-//
-// Notable differences from the webpack equivalent:
-//   - Uses @rspack/core (webpack-5-compatible) instead of webpack.
-//   - @ngtools/webpack is reused as a loader+plugin in jitMode: the loader
-//     does TypeScript → JS (with Angular AOT transforms) and rewrites
-//     `templateUrl: './x.pug'` to `template: require('./x.pug')`. This is the
-//     same trick that the legacy webpack build used.
-//   - ESM linking is relaxed so type-only re-exports in Angular decorator
-//     metadata don't fail the build.
-
 import * as fs from 'fs'
 import * as path from 'path'
 import rspack from '@rspack/core'
@@ -49,10 +33,6 @@ export default options => {
         mode: isDev ? 'development' : 'production',
         optimization: {
             minimize: false,
-            // Angular JIT uses classes/interfaces that are only referenced in
-            // decorator metadata. Rspack's ESM linker is stricter than
-            // webpack's; disable aggressive tree-shaking so it doesn't drop
-            // re-exports of those identifiers.
             usedExports: false,
             sideEffects: false,
             providedExports: true,
