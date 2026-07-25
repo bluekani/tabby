@@ -1,0 +1,19 @@
+diff --git a/node_modules/@ngtools/webpack/src/ivy/plugin.js b/node_modules/@ngtools/webpack/src/ivy/plugin.js
+index c8208ee..557d2d6 100644
+--- a/node_modules/@ngtools/webpack/src/ivy/plugin.js
++++ b/node_modules/@ngtools/webpack/src/ivy/plugin.js
+@@ -107,6 +107,14 @@ class AngularWebpackPlugin {
+         // Set resolver options
+         const pathsPlugin = new paths_plugin_1.TypeScriptPathsPlugin();
+         compiler.hooks.afterResolvers.tap(PLUGIN_NAME, (compiler) => {
++            // Rspack note: Rspack's `resolverFactory.hooks.resolveOptions` does
++            // not expose a `for(type)` API (the underlying enhanced-resolve
++            // hook is not surfaced). The Ivy `*_ivy_ngcc` mainFields rewrite
++            // is only meaningful for the legacy NGCC pipeline, which we do
++            // not use under Rspack; skip it.
++            if (typeof compiler.resolverFactory?.hooks?.resolveOptions?.for !== 'function') {
++                return;
++            }
+             // When Ivy is enabled we need to add the fields added by NGCC
+             // to take precedence over the provided mainFields.
+             // NGCC adds fields in package.json suffixed with '_ivy_ngcc'

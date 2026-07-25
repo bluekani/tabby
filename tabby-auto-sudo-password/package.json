@@ -8,15 +8,17 @@
   "main": "dist/index.js",
   "typings": "typings/index.d.ts",
   "scripts": {
-    "build": "webpack --progress --color --display-modules",
-    "watch": "webpack --progress --color --watch"
+    "build": "node ../node_modules/@rspack/cli/bin/rspack.js build",
+    "watch": "node ../node_modules/@rspack/cli/bin/rspack.js watch"
   },
   "files": [
     "dist",
     "typings"
   ],
   "devDependencies": {
-    "ansi-colors": "^4.1.1"
+    "@angular/compiler-cli": "^15.2.6",
+    "ansi-colors": "^4.1.1",
+    "typescript": "^4.9.5"
   },
   "author": "Tabby Developers",
   "license": "MIT"
