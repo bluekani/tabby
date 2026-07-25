@@ -3,6 +3,8 @@
 import { build as builder } from 'electron-builder'
 import * as vars from './vars.mjs'
 import { execSync } from 'child_process'
+import * as fs from 'fs'
+import * as path from 'path'
 
 const isTag = (process.env.GITHUB_REF || process.env.BUILD_SOURCEBRANCH || '').startsWith('refs/tags/')
 const keypair = process.env.SM_KEYPAIR_ALIAS
@@ -11,6 +13,32 @@ process.env.ARCH = process.env.ARCH || process.arch
 
 console.log('Signing enabled:', !!keypair)
 
+function findVCRuntimeDir(arch) {
+    const patterns = [
+        `C:\\Program Files\\Microsoft Visual Studio\\2022\\*\\VC\\Redist\\MSVC\\*\\${arch}\\Microsoft.VC*.CRT`,
+        `C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\*\\VC\\Redist\\MSVC\\*\\${arch}\\Microsoft.VC*.CRT`,
+        `C:\\BuildTools\\VC\\Redist\\MSVC\\*\\${arch}\\Microsoft.VC*.CRT`,
+    ]
+    for (const pattern of patterns) {
+        try {
+            const escaped = pattern.replace(/'/g, `''`)
+            const out = execSync(
+                `powershell -NoProfile -Command "Get-ChildItem -Path '${escaped}' -Directory -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName"`,
+                { encoding: 'utf-8' },
+            ).trim()
+            if (out) {
+                console.log(`VC Runtime CRT dir: ${out}`)
+                return out
+            }
+        } catch {
+            // try next pattern
+        }
+    }
+    return null
+}
+
+const crtDir = findVCRuntimeDir(process.env.ARCH)
+
 builder({
     dir: true,
     win: ['nsis', 'zip'],
@@ -18,6 +46,17 @@ builder({
     config: {
         extraMetadata: {
             version: vars.version,
+        },
+        afterPack: async (context) => {
+            if (!crtDir || context.electronPlatformName !== 'win32') {
+                return
+            }
+            if (!context.targets.some(t => t.name === 'zip')) {
+                return
+            }
+            for (const dll of ['vcruntime140.dll', 'vcruntime140_1.dll', 'msvcp140.dll']) {
+                fs.copyFileSync(path.join(crtDir, dll), path.join(context.appOutDir, dll))
+            }
         },
         publish: process.env.KEYGEN_TOKEN ? [
             vars.keygenConfig,
