@@ -51,16 +51,13 @@ builder({
             if (!crtDir || context.electronPlatformName !== 'win32') {
                 return
             }
-            console.log(`afterPack: targets=${context.targets.map(t => t.name).join(',')} outDir=${context.outDir} appOutDir=${context.appOutDir}`)
-            const targetName = context.targets[0]?.name
+            const hasZip = context.targets.some(t => t.name === 'zip')
             for (const dll of ['vcruntime140.dll', 'vcruntime140_1.dll', 'msvcp140.dll']) {
                 const p = path.join(context.appOutDir, dll)
-                if (targetName === 'zip') {
+                if (hasZip) {
                     fs.copyFileSync(path.join(crtDir, dll), p)
-                    console.log(`afterPack: copied ${dll}`)
-                } else if (targetName === 'nsis' && fs.existsSync(p)) {
+                } else if (fs.existsSync(p)) {
                     fs.unlinkSync(p)
-                    console.log(`afterPack: removed ${dll}`)
                 }
             }
         },
