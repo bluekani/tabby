@@ -51,11 +51,17 @@ builder({
             if (!crtDir || context.electronPlatformName !== 'win32') {
                 return
             }
-            if (!context.targets.some(t => t.name === 'zip')) {
-                return
-            }
+            const isNsis = context.targets.some(t => t.name === 'nsis')
+            const isZip = context.targets.some(t => t.name === 'zip')
             for (const dll of ['vcruntime140.dll', 'vcruntime140_1.dll', 'msvcp140.dll']) {
-                fs.copyFileSync(path.join(crtDir, dll), path.join(context.appOutDir, dll))
+                const p = path.join(context.appOutDir, dll)
+                if (isNsis) {
+                    if (fs.existsSync(p)) {
+                        fs.unlinkSync(p)
+                    }
+                } else if (isZip) {
+                    fs.copyFileSync(path.join(crtDir, dll), p)
+                }
             }
         },
         publish: process.env.KEYGEN_TOKEN ? [
